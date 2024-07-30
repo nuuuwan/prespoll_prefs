@@ -1,7 +1,7 @@
 export default class Human {
-  constructor(name) {
+  constructor(name, emoji = undefined) {
     this.name = name;
-    this.emoji = ["👨🏻", "👩🏻"][Math.floor(Math.random() * 2)];
+    this.emoji = emoji || ["👨🏻", "👩🏻"][Math.floor(Math.random() * 2)];
   }
 
   get nameAndEmoji() {

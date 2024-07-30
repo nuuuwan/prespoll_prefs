@@ -169,14 +169,20 @@ export default class Election {
   // Random Data
 
   static getRandomCandidate(candidates) {
-    const n = candidates.length;
-    const TOP_BIAS = 1.5;
-    for (let i = 0; i < n; i++) {
-      const p = 1 / (n - i);
-      if (Math.random() < p * TOP_BIAS) {
-        return candidates[i];
+    const totalWeight = candidates.reduce(
+      (acc, candidate) => acc + candidate.weight,
+      0
+    );
+    let remWeight = totalWeight;
+
+    for (let candidate of candidates) {
+      const p = candidate.weight / remWeight;
+      if (Math.random() < p) {
+        return candidate;
       }
+      remWeight -= candidate.weight;
     }
+
     throw new Error("This should never happen.");
   }
 
@@ -193,28 +199,60 @@ export default class Election {
     return preferences;
   }
 
-  static random(nCandidates, nVoters) {
+  static getRandomCandidates(nCandidates) {
     const candidates = [];
     for (let i = 0; i < nCandidates; i++) {
       const char = String.fromCharCode(65 + (i % 26));
-      candidates.push(new Candidate(`Candidate ${char}`, Color.random()));
+      candidates.push(
+        new Candidate(`Candidate ${char}`, undefined, 1, Color.random())
+      );
     }
+    return candidates;
+  }
 
+  static getRandomVoters(nVoters) {
     const voters = [];
     for (let i = 0; i < nVoters; i++) {
       voters.push(new Voter(`Voter ${i + 1}`));
     }
+    return voters;
+  }
 
-    const election = new Election(candidates, voters, []);
-
+  static getRandomBallots(election) {
     const ballots = [];
-    for (const voter of voters) {
+    for (const voter of election.voters) {
       const preferences = Election.getRandomPreferences(election);
       const ballot = new Ballot(election, voter, preferences);
       ballots.push(ballot);
     }
-    election.ballots = ballots;
+    return ballots;
+  }
 
+  static random(nCandidates, nVoters) {
+    const candidates = Election.getRandomCandidates(nCandidates);
+    const voters = Election.getRandomVoters(nVoters);
+    const election = new Election(candidates, voters, []);
+    election.ballots = Election.getRandomBallots(election);
+    return election;
+  }
+
+  static getPresPoll2024Candidates() {
+    // "IHP MRP Presidential Election Voting Intentions Update May 2024"
+    // https://www.ihp.lk/press-releases/ak-dissanayake-39-and-sajith-premadasa-38-continue-bolster-support-presidential
+    const NOISE = 20;
+    return [
+      new Candidate("NPP", "🧔🏻‍♂️", 39 + NOISE, "#f008"),
+      new Candidate("SJB", "👨🏻‍🦱", 38 + NOISE, "#2f08"),
+      new Candidate("UNP", "🧓🏻", 15 + NOISE, "#0c08"),
+      new Candidate("SLPP", "👨🏻", 7 + NOISE, "#8008"),
+    ];
+  }
+
+  static randomPresPoll2024(nVoters) {
+    const candidates = Election.getPresPoll2024Candidates();
+    const voters = Election.getRandomVoters(nVoters);
+    const election = new Election(candidates, voters, []);
+    election.ballots = Election.getRandomBallots(election);
     return election;
   }
 }

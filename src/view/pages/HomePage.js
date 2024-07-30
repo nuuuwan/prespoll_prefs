@@ -5,7 +5,7 @@ export default class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      election: Election.random(4, 11),
+      election: Election.randomPresPoll2024(11),
     };
   }
 

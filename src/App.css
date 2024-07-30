@@ -11,10 +11,10 @@ table {
 }
 th {
   padding: 6px;
-  text-align: right;
+  text-align: centre;
 }
 td {
   padding: 3px;
   padding-left: 12px;
-  text-align: right;
+  text-align: centre;
 }
